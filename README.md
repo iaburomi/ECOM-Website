@@ -1,3 +1,2 @@
 # IT202
-#Issa
-#I like to work on cars
+My name is Issa and I like to work on cars
