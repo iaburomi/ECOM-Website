@@ -1,0 +1,11 @@
+h1{
+    color:black;
+}
+p{
+    color:red;
+    font:12px;
+}
+body{
+    background-color: darkslategray;
+    color:white;
+}
