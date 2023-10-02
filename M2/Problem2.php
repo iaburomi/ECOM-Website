@@ -14,6 +14,11 @@ function getTotal($arr) {
     echo "The total is " . var_export($total, true);
 }
 echo "Problem 2: Adding Floats<br>";
+M2-PHP-HW
+//iaa47
+//10/1/23
+=======
+dev
 ?>
 <table>
     <thread>
