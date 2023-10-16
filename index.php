@@ -1,6 +1,6 @@
-<html>
+</html>
     <head>
-        <title>My class website</title>
+        Welcome to Our Website
         <meta>it202 class</meta>
         <script>
             console.log("sample javasript")
