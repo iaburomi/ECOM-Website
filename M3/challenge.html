@@ -2,18 +2,31 @@
 <html lang="en-US">
 
 <head>
-    <title><li><a href="#Problem 1">Problem 1</a></li></title>
+    <title>Problem 1</title>
     <meta charset="utf-8" />
     <script>
         window.addEventListener("load", () => {
             console.log("loaded via javascript");
             //TODO: add any extra onload processing you may need here
+            let navLinks = document.querySelectorAll("nav a");
+            navLinks.forEach(link => {
+                link.addEventListener("click", (event) =>{
+                    event.preventDefault();
+                    getCurrentSelection(link.textContent);
+                })
+            })
         });
         function getCurrentSelection() {
             setTimeout(() => {
                 //added this delay here as some solutions may require it to update properly (i.e., click code may complete before the navigation changes)
                 //TODO: add code for processing the current selection goo1
                 //goo2 Note: likely you'll want to call updateCurrentPage towards the end
+                let h1Element = document.querySelector("h1");
+                if (h1Element){
+                    h1Element.textContent = newText;
+                }
+                document.title = newText;
+                updateCurrentPage(newText);
             }, 100);
         }
     </script>
