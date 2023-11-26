@@ -43,8 +43,6 @@ try {
          * Be careful with naming, 1-9 is fine, 1-10 has 10 run after #1 due to string sorting.
          */
         ksort($sql);
-        //connect to DB
-        $db = getDB();
         /***
          * Let's make this function a bit smarter to save DB calls for small dev plans (i.e., heroku)
          */
