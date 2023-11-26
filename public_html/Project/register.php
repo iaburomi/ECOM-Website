@@ -1,5 +1,5 @@
 <?php
-require(__DIR__ . "/../../partials/nav.php");
+require_once(__DIR__ . "/db.php");
 ?>
 <form onsubmit="return validate(this)" method="POST">
     <div>
@@ -77,7 +77,7 @@ if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirm
             echo "Successfully registered!";
         } catch (Exception $e) {
             echo "There was a problem registering";
-            "<pre>" . var_export($e, true) . "</pre>";
+            echo"<pre>" . var_export($e, true) . "</pre>";
         }
     }
 }
