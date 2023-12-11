@@ -17,15 +17,12 @@ function makeSquare(x, y, length, speed) {
     }
   };
 }
-
 // The ship the user controls
 var ship = makeSquare(50, canvas.height / 2 - 25, 50, 5);
-
 // Flags to tracked which keys are pressed
 var up = false;
 var down = false;
 var space = false;
-
 // Is a bullet already on the canvas?
 var shooting = false;
 // The bulled shot from the ship
@@ -33,7 +30,43 @@ var bullet = makeSquare(0, 0, 10, 10);
 
 // An array for enemies (in case there are more than one)
 var enemies = [];
+//iaa47
+//Shot cooldown to prevent the player from firing bullets too quickly
+var canShoot = true;
+var shootingCooldown = 500; // milliseconds
 
+function shoot() {
+  if (!shooting && canShoot) {
+    shooting = true;
+    bullet.x = ship.x + ship.l;
+    bullet.y = ship.y + ship.l / 2;
+    canShoot = false;
+    // Set a cooldown before the player can shoot again
+    setTimeout(function () {
+      canShoot = true;
+    }, shootingCooldown);
+  }
+}
+//iaa47
+//To make the game visually more interesting I assigned random colors to the enemies 
+function makeEnemy() {
+  var enemyX = canvas.width;
+  var enemySize = Math.round((Math.random() * 15)) + 15;
+  var enemyY = Math.round(Math.random() * (canvas.height - enemySize * 2)) + enemySize;
+  var enemySpeed = Math.round(Math.random() * enemyBaseSpeed) + enemyBaseSpeed;
+  var enemyColor = '#' + Math.floor(Math.random()*16777215).toString(16); // Random HEX color
+  enemies.push({
+    x: enemyX,
+    y: enemyY,
+    l: enemySize,
+    s: enemySpeed,
+    color: enemyColor,
+    draw: function () {
+      context.fillStyle = this.color;
+      context.fillRect(this.x, this.y, this.l, this.l);
+    }
+  });
+}
 // Add an enemy object to the array
 var enemyBaseSpeed = 2;
 function makeEnemy() {
@@ -137,34 +170,24 @@ function erase() {
   context.fillRect(0, 0, 600, 400);
 }
 
-// Shoot the bullet (if not already on screen)
-function shoot() {
-  if (!shooting) {
-    shooting = true;
-    bullet.x = ship.x + ship.l;
-    bullet.y = ship.y + ship.l / 2;
-  }
-}
-
 // The main draw loop
+// Inside the draw function, call handleCollisions before processing other logic
+//iaa47
+//12/10/23
 function draw() {
   erase();
   var gameOver = false;
   // Move and draw the enemies
-  enemies.forEach(function(enemy) {
+  enemies.forEach(function (enemy) {
     enemy.x -= enemy.s;
     if (enemy.x < 0) {
       gameOver = true;
     }
-    context.fillStyle = '#00FF00';
+    context.fillStyle = enemy.color;
     enemy.draw();
   });
-  // Collide the ship with enemies
-  enemies.forEach(function(enemy, i) {
-    if (isColliding(enemy, ship)) {
-      gameOver = true;
-    }
-  });
+  // Handle collisions and decrement lives
+  handleCollisions();
   // Move the ship
   if (down) {
     ship.y += ship.s;
@@ -187,7 +210,9 @@ function draw() {
     // Move the bullet
     bullet.x += bullet.s;
     // Collide the bullet with enemies
-    enemies.forEach(function(enemy, i) {
+    enemies.forEach(function (enemy, i) {
+      //iaa47
+      //12/10
       if (isColliding(bullet, enemy)) {
         enemies.splice(i, 1);
         score++;
@@ -201,7 +226,7 @@ function draw() {
           enemyBaseSpeed += 1;
         }
       }
-    });
+    });  
     // Collide with the wall
     if (bullet.x > canvas.width) {
       shooting = false;
@@ -210,11 +235,13 @@ function draw() {
     context.fillStyle = '#0000FF';
     bullet.draw();
   }
-  // Draw the score
+  // Draw the remaining lives
   context.fillStyle = '#000000';
   context.font = '24px Arial';
   context.textAlign = 'left';
-  context.fillText('Score: ' + score, 1, 25)
+  context.fillText('Lives: ' + lives, 1, 50);
+  // Draw the score
+  context.fillText('Score: ' + score, 1, 25);
   // End or continue the game
   if (gameOver) {
     endGame();
@@ -222,6 +249,7 @@ function draw() {
     window.requestAnimationFrame(draw);
   }
 }
+
 
 // Start the game
 menu();
