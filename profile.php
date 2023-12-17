@@ -7,6 +7,30 @@ $profileMessage = isset($_SESSION["user"]["profile_message"]) ? $_SESSION["user"
 $username = isset($_SESSION["user"]["username"]) ? $_SESSION["user"]["username"] : '';
 $email = isset($_SESSION["user"]["email"]) ? $_SESSION["user"]["email"] : '';
 
+// Function to update user information
+function updateUserInformation($newUsername, $newEmail, $newProfileMessage)
+{
+    // Implement your logic to update the user information in the database
+    // ...
+
+    // Update session variables
+    $_SESSION["user"]["username"] = $newUsername;
+    $_SESSION["user"]["email"] = $newEmail;
+    $_SESSION["user"]["profile_message"] = $newProfileMessage;
+}
+
+// Check if the form is submitted for updating information
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $newUsername = isset($_POST["newUsername"]) ? trim($_POST["newUsername"]) : '';
+    $newEmail = isset($_POST["newEmail"]) ? trim($_POST["newEmail"]) : '';
+    $newProfileMessage = isset($_POST["newProfileMessage"]) ? trim($_POST["newProfileMessage"]) : '';
+
+    // Validate inputs as needed
+
+    // Update user information
+    updateUserInformation($newUsername, $newEmail, $newProfileMessage);
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -128,10 +152,19 @@ $email = isset($_SESSION["user"]["email"]) ? $_SESSION["user"]["email"] : '';
         <div id="editProfileModalContent">
             <span id="closeEditProfileModal" onclick="closeEditProfileModal()">×</span>
             <h2>Edit Profile</h2>
-            <form id="editProfileForm" onsubmit="return validateEditProfileForm()">
-                <label for="newProfileMessage">New Profile Message:</label>
-                <textarea id="newProfileMessage" name="newProfileMessage" rows="4" cols="50"></textarea>
+            <form id="editProfileForm" method="post" onsubmit="return validateEditProfileForm()">
+                <label for="newUsername">New Username:</label>
+                <input type="text" id="newUsername" name="newUsername" value="<?php echo htmlspecialchars($username); ?>">
                 <br>
+
+                <label for="newEmail">New Email:</label>
+                <input type="email" id="newEmail" name="newEmail" value="<?php echo htmlspecialchars($email); ?>">
+                <br>
+
+                <label for="newProfileMessage">New Profile Message:</label>
+                <textarea id="newProfileMessage" name="newProfileMessage" rows="4" cols="50"><?php echo htmlspecialchars($profileMessage); ?></textarea>
+                <br>
+
                 <input type="submit" value="Save">
             </form>
         </div>
@@ -147,24 +180,8 @@ $email = isset($_SESSION["user"]["email"]) ? $_SESSION["user"]["email"] : '';
         }
 
         function validateEditProfileForm() {
-            var newProfileMessage = document.getElementById('newProfileMessage').value.trim();
-            // You can add more complex validation logic here
-            if (newProfileMessage.includes("inappropriate")) {
-                alert("Inappropriate message, please retype.");
-                return false;
-            }
-            // Save the new profile message to the session or your database
-            <?php
-            if (isset($_SESSION["user"]["email"])) {
-                echo 'var user_email = "' . $_SESSION["user"]["email"] . '";';
-                echo 'document.getElementById("profileMessage").innerHTML = "' . addslashes($newProfileMessage) . '";';
-                echo 'var profileMessage = "' . addslashes($newProfileMessage) . '";';
-                $_SESSION["user"]["profile_message"] = $newProfileMessage; // Assuming you save it in the session
-
-            }
-            ?>
-            closeEditProfileModal();
-            return false;
+            // Implement validation logic as needed
+            return true;
         }
     </script>
 
