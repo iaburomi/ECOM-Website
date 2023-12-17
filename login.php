@@ -135,6 +135,17 @@ if (isset($_SESSION['logout_message'])) {
                 echo "<p class='error'>Password must not be empty</p>";
                 $hasError = true;
             }
+            if ($user && password_verify($password, $user["password"])) {
+                $_SESSION["user"] = [
+                    "id" => $user["id"],
+                    "email" => $user["email"],
+                    "role" => $user["role"],  // Add this line to store the role
+                ];
+                header("Location: home.php");
+                exit();
+            } else {
+                echo "<p class='error'>Invalid email or password</p>";
+            }
 
             if (!$hasError) {
                 $db = getDB();
