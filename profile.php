@@ -1,8 +1,12 @@
 <?php
 session_start();
 
-// Assuming your login logic sets the 'role' in the session
+// Assuming your login logic sets the 'role', 'profile_message', 'username', and 'email' in the session
 $userRole = isset($_SESSION["user"]["role"]) ? $_SESSION["user"]["role"] : 'user';
+$profileMessage = isset($_SESSION["user"]["profile_message"]) ? $_SESSION["user"]["profile_message"] : '';
+$username = isset($_SESSION["user"]["username"]) ? $_SESSION["user"]["username"] : '';
+$email = isset($_SESSION["user"]["email"]) ? $_SESSION["user"]["email"] : '';
+
 ?>
 
 <!DOCTYPE html>
@@ -11,8 +15,9 @@ $userRole = isset($_SESSION["user"]["role"]) ? $_SESSION["user"]["role"] : 'user
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Profile</title>
     <style>
+        /* Your CSS styles here */
         body {
             background-color: <?php echo $userRole === 'admin' ? 'white' : '#f4f4f4'; ?>;
             font-family: 'Arial', sans-serif;
@@ -42,31 +47,6 @@ $userRole = isset($_SESSION["user"]["role"]) ? $_SESSION["user"]["role"] : 'user
 
         p {
             color: #555;
-        }
-
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        .success {
-            color: green;
-        }
-
-        #changeColorBtn {
-            display: <?php echo $userRole === 'admin' ? 'block' : 'none'; ?>;
-            padding: 8px;
-            background-color: #007bff;
-            color: #fff;
-            cursor: pointer;
-        }
-
-        #changeColorBtn:hover {
-            background-color: #0056b3;
         }
 
         #profileSection {
@@ -128,49 +108,25 @@ $userRole = isset($_SESSION["user"]["role"]) ? $_SESSION["user"]["role"] : 'user
 <body>
 
     <header>
-        <h1>Welcome to Your Website</h1>
+        <h1>Profile</h1>
     </header>
 
     <main>
         <?php
-        // Display the logout message if available
-        if (!empty($_SESSION['logout_message'])) {
-            echo "<p class='success'>{$_SESSION['logout_message']}</p>";
-            // Remove the logout message from the session to prevent it from displaying again
-            unset($_SESSION['logout_message']);
-        }
-
-        // Display the welcome message or login prompt
-        if (isset($_SESSION["user"]["email"])) {
-            $user_email = $_SESSION["user"]["email"];
-            echo "<p>Welcome, $user_email</p>";
-            echo '<p><a href="logout.php">Logout</a></p>'; // Logout link
-
-            // Display the change color button for admins
-            if ($userRole === 'admin') {
-                echo '<button id="changeColorBtn" onclick="changeBackgroundColor()">Change Color</button>';
-            }
-
-            // Display the profile section
-            echo '<div id="profileSection">';
-            echo '<button id="editProfileBtn" onclick="openEditProfileModal()">Edit Profile</button>';
-            echo '<p id="profileMessage">';
-            // Fetch and display user's profile message
-            echo isset($_SESSION["user"]["profile_message"]) ? $_SESSION["user"]["profile_message"] : 'No profile message set';
-            echo '</p>';
-            echo '</div>';
-        } else {
-            // User is not logged in, display message and login button
-            echo "<p>You need to be logged in first</p>";
-            echo '<p><a href="login.php">Login</a></p>'; // Login button
-        }
+        // Display the profile section
+        echo '<div id="profileSection">';
+        echo '<p>Username: ' . htmlspecialchars($username) . '</p>';
+        echo '<p>Email: ' . htmlspecialchars($email) . '</p>';
+        echo '<p>Profile Message: ' . htmlspecialchars($profileMessage) . '</p>';
+        echo '<button id="editProfileBtn" onclick="openEditProfileModal()">Edit Profile</button>';
+        echo '</div>';
         ?>
     </main>
 
     <!-- Edit Profile Modal -->
     <div id="editProfileModal">
         <div id="editProfileModalContent">
-            <span id="closeEditProfileModal" onclick="closeEditProfileModal">&times;</span>
+            <span id="closeEditProfileModal" onclick="closeEditProfileModal()">×</span>
             <h2>Edit Profile</h2>
             <form id="editProfileForm" onsubmit="return validateEditProfileForm()">
                 <label for="newProfileMessage">New Profile Message:</label>
@@ -182,9 +138,33 @@ $userRole = isset($_SESSION["user"]["role"]) ? $_SESSION["user"]["role"] : 'user
     </div>
 
     <script>
-        function changeBackgroundColor() {
-            // Add your logic to change the background color here
-            document.body.style.backgroundColor = 'black';
+        function openEditProfileModal() {
+            document.getElementById('editProfileModal').style.display = 'block';
+        }
+
+        function closeEditProfileModal() {
+            document.getElementById('editProfileModal').style.display = 'none';
+        }
+
+        function validateEditProfileForm() {
+            var newProfileMessage = document.getElementById('newProfileMessage').value.trim();
+            // You can add more complex validation logic here
+            if (newProfileMessage.includes("inappropriate")) {
+                alert("Inappropriate message, please retype.");
+                return false;
+            }
+            // Save the new profile message to the session or your database
+            <?php
+            if (isset($_SESSION["user"]["email"])) {
+                echo 'var user_email = "' . $_SESSION["user"]["email"] . '";';
+                echo 'document.getElementById("profileMessage").innerHTML = "' . addslashes($newProfileMessage) . '";';
+                echo 'var profileMessage = "' . addslashes($newProfileMessage) . '";';
+                $_SESSION["user"]["profile_message"] = $newProfileMessage; // Assuming you save it in the session
+
+            }
+            ?>
+            closeEditProfileModal();
+            return false;
         }
     </script>
 

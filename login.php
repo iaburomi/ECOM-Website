@@ -1,4 +1,14 @@
 <?php
+session_start();
+
+$_SESSION["user"]["username"] = $username; // Replace $username with the actual username from your database
+$_SESSION["user"]["email"] = $email; // Replace $email with the actual email from your database
+$_SESSION["user"]["role"] = $role; // Replace $role with the actual role from your database
+$_SESSION["user"]["profile_message"] = $profile_message; // Replace $profile_message with the actual profile message from your database
+
+header("Location: home.php");
+exit();
+
 require(__DIR__ . "/partials/nav.php");
 if (isset($_SESSION['logout_message'])) {
     echo "<p>{$_SESSION['logout_message']}</p>";
@@ -139,7 +149,6 @@ if (isset($_SESSION['logout_message'])) {
                 $_SESSION["user"] = [
                     "id" => $user["id"],
                     "email" => $user["email"],
-                    "role" => $user["role"],  // Add this line to store the role
                 ];
                 header("Location: home.php");
                 exit();
