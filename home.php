@@ -1,6 +1,10 @@
 <?php
-session_start(); // Ensure session is started
+session_start();
+
+// Assuming your login logic sets the 'role' in the session
+$userRole = isset($_SESSION["user"]["role"]) ? $_SESSION["user"]["role"] : 'user';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,7 +14,7 @@ session_start(); // Ensure session is started
     <title>Home</title>
     <style>
         body {
-            background-color: #f4f4f4;
+            background-color: <?php echo $userRole === 'admin' ? 'white' : '#f4f4f4'; ?>;
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
@@ -52,6 +56,18 @@ session_start(); // Ensure session is started
         .success {
             color: green;
         }
+
+        #changeColorBtn {
+            display: <?php echo $userRole === 'admin' ? 'block' : 'none'; ?>;
+            padding: 8px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #changeColorBtn:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 
@@ -75,6 +91,11 @@ session_start(); // Ensure session is started
             $user_email = $_SESSION["user"]["email"];
             echo "<p>Welcome, $user_email</p>";
             echo '<p><a href="logout.php">Logout</a></p>'; // Logout link
+
+            // Display the change color button for admins
+            if ($userRole === 'admin') {
+                echo '<button id="changeColorBtn" onclick="changeBackgroundColor()">Change Color</button>';
+            }
         } else {
             // User is not logged in, display message and login button
             echo "<p>You need to be logged in first</p>";
@@ -82,6 +103,22 @@ session_start(); // Ensure session is started
         }
         ?>
     </main>
+    <button id="changeColorBtn" onclick="changeBackgroundColor()">Change Color</button>
+
+    <script>
+        function changeBackgroundColor() {
+            // Add your logic to change the background color here
+            document.body.style.backgroundColor = 'black';
+        }
+    </script>
+
+    <script>
+        function changeBackgroundColor() {
+            // Add your logic to change the background color here
+            document.body.style.backgroundColor = 'black';
+        }
+    </script>
+
 
 </body>
 
