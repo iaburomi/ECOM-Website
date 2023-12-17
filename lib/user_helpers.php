@@ -19,10 +19,14 @@ function get_username() {
     return "";
 }
 function get_user_email() {
-    if (is_logged_in()) { //we need to check for login first because "user" key may not exist
+    // Check if the user is logged in
+    if (is_logged_in()) {
+        // Assuming you have stored the user's email in the session under the key 'user_email'
         return se($_SESSION["user"], "email", "", false);
+    } else {
+        // Return null or any default value if the user is not logged in
+        return null;
     }
-    return "";
 }
 function get_user_id() {
     if (is_logged_in()) { //we need to check for login first because "user" key may not exist

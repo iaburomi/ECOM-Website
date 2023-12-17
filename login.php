@@ -1,6 +1,7 @@
 <?php
 require(__DIR__ . "/partials/nav.php");
 ?>
+<body style='background-color:lightgray'>
 <form onsubmit="return validate(this)" method="POST">
     <div>
         <label for="email">Email</label>
@@ -8,69 +9,70 @@ require(__DIR__ . "/partials/nav.php");
     </div>
     <div>
         <label for="username">Username</label>
-        <input type="username" name="username" required />
+        <input type="text" name="username" required />
     </div>
     <div>
-        <label for="pw">Password</label>
+        <label for="password">Password</label>
         <input type="password" id="pw" name="password" required minlength="8" />
     </div>
     <input type="submit" value="Login" />
 </form>
 <script>
     function validate(form) {
-        //TODO 1: implement JavaScript validation
-        //ensure it returns false for an error and true for success
-
+        // TODO: Implement JavaScript validation
+        // Ensure it returns false for an error and true for success
         return true;
     }
 </script>
 <?php
-//TODO 2: add PHP Code
-if (isset($_POST["email"]) && isset($_POST["password"])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = se($_POST, "email", "", false);
+    $username = se($_POST, "username", "", false);
     $password = se($_POST, "password", "", false);
 
-    //TODO 3
     $hasError = false;
+
     if (empty($email)) {
         echo "Email must not be empty";
         $hasError = true;
     }
-    //sanitize
+
+    if (empty($username)) {
+        echo "Username must not be empty";
+        $hasError = true;
+    }
+
+    // Sanitize and validate email
     $email = sanitize_email($email);
-    //validate
     if (!is_valid_email($email)) {
         echo "Invalid email address";
         $hasError = true;
     }
+
     if (empty($password)) {
-        echo "password must not be empty";
+        echo "Password must not be empty";
         $hasError = true;
     }
-    if (strlen($password) < 8) {
-        echo "Password too short";
-        $hasError = true;
-    }
+
     if (!$hasError) {
-        //TODO 4
         $db = getDB();
-        $stmt = $db->prepare("SELECT email, password from Users where email = :email");
+        $stmt = $db->prepare("SELECT id, email, password FROM Users WHERE email = :email");
         try {
             $r = $stmt->execute([":email" => $email]);
+
             if ($r) {
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
-                if ($user) {
-                    $hash = $user["password"];
-                    unset($user["password"]);
-                    if (password_verify($password, $hash)) {
-                        echo "Weclome $email";
-                        $_SESSION["user"] = $user;
-                        die(header("Location: home.php"));
-                    } else {
-                        echo "Invalid password";
-                    }
+
+                if ($user && password_verify($password, $user["password"])) {
+                    echo "Welcome, $email";
+                    $_SESSION["user"] = [
+                        "id" => $user["id"],
+                        "email" => $user["email"],
+                    ];
+                    header("Location: home.php");
+                    exit();
                 } else {
-                    echo "Email not found";
+                    echo "Invalid email or password";
                 }
             }
         } catch (Exception $e) {

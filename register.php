@@ -1,6 +1,8 @@
 <?php
 require(__DIR__ . "/partials/nav.php");
 ?>
+<body style='background-color:lightgray'>
+
 <form onsubmit="return validate(this)" method="POST">
     <div>
         <label for="email">Email</label>
@@ -30,45 +32,55 @@ require(__DIR__ . "/partials/nav.php");
 </script>
 <?php
 //TODO 2: add PHP Code
-if (isset($_POST["email"]) && isset($_POST["password"]) && (isset($_POST["confirm"]))){
+if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirm"])) {
     $email = se($_POST, "email", "", false);
-    $username = se($_POST, "username", "",false);
+    $username = se($_POST, "username", "", false);
     $password = se($_POST, "password", "", false);
     $confirm = se($_POST, "confirm", "", false);
     //TODO 3
     $hasError = false;
+    $errorMessages = [];
 
+    // Check if passwords match
+    if ($password !== $confirm) {
+        $errorMessages[] = "Passwords do not match";
+        $hasError = true;
+    }
+
+    // Check if email is empty
     if (empty($email)) {
         $errorMessages[] = "Email must not be empty";
         $hasError = true;
     }
-    
 
-    //Check DB if email is already taken
-   
+    // Check if username already taken
+    $db = getDB();
+    $stmt = $db->prepare("SELECT username FROM Users WHERE username = :username");
+    $stmt->execute([":username" => $username]);
+    $existingUsername = $stmt->fetchColumn();
 
+    if ($existingUsername) {
+        $errorMessages[] = "Username is already taken";
+        $hasError = true;
+    }
 
-    // Check DB if username is already taken
-   
     if (!$hasError) {
         echo "Welcome, $email";
         //TODO 4
         $hash = password_hash($password, PASSWORD_BCRYPT);
-        $db = getDB();
         $stmt = $db->prepare("INSERT INTO Users (email, password, username) VALUES(:email, :password, :username)");
         try {
             $stmt->execute([":email" => $email, ":password" => $hash, ":username" => $username]);
             echo "\nSuccessfully registered!";
         } catch (Exception $e) {
             echo "\nThere was a problem registering";
-            "<pre>" . var_export($e, true) . "</pre>";
+            echo "<pre>" . var_export($e, true) . "</pre>";
         }
-    }
-
-    else {
-        //Email and username don't get cleared for password mismatch
-        $enteredEmail = $_POST["email"];
-        $enteredUsername = $_POST["username"];
+    } else {
+        // Display error messages
+        foreach ($errorMessages as $errorMessage) {
+            echo "<p>Error: $errorMessage</p>";
+        }
     }
 }
 ?>

@@ -14,14 +14,14 @@ function getDB(){
             //it gets the absolute path to this file, then we append the relative url (so up a directory and inside lib)
             require_once(__DIR__. "/config.php");//pull in our credentials
             //use the variables from config to populate our connection
-            $connection_string = "mysql://iaa47:gTH72U1VGGuu@db.ethereallab.app:3306/iaa47";
+            $connection_string = "mysql:host=$dbhost;dbname=$dbdatabase;charset=utf8mb4";
             //using the PDO connector create a new connect to the DB
             //if no error occurs we're connected
             $db = new PDO($connection_string, $dbuser, $dbpass);
-	    //the default fetch mode is FETCH_BOTH which returns the data as both an indexed array and associative array
-	    //we'll override the default here so it's always fetched as an associative array
- 	    $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-	}
+	        //the default fetch mode is FETCH_BOTH which returns the data as both an indexed array and associative array
+	        //we'll override the default here so it's always fetched as an associative array
+ 	        $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+	    }
    	catch(Exception $e){
             error_log("getDB() error: " . var_export($e, true));
             $db = null;
