@@ -1,5 +1,5 @@
 <?php
-require(__DIR__ . "/partials/nav.php");
+session_start(); // Ensure session is started
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +33,7 @@ require(__DIR__ . "/partials/nav.php");
         }
 
         h1 {
-            color: white; /* Change color to white */
+            color: white;
         }
 
         p {
@@ -48,6 +48,10 @@ require(__DIR__ . "/partials/nav.php");
         a:hover {
             text-decoration: underline;
         }
+
+        .success {
+            color: green;
+        }
     </style>
 </head>
 
@@ -59,14 +63,22 @@ require(__DIR__ . "/partials/nav.php");
 
     <main>
         <?php
-        session_start(); // Ensure session is started
+        // Display the logout message if available
+        if (!empty($_SESSION['logout_message'])) {
+            echo "<p class='success'>{$_SESSION['logout_message']}</p>";
+            // Remove the logout message from the session to prevent it from displaying again
+            unset($_SESSION['logout_message']);
+        }
 
+        // Display the welcome message or login prompt
         if (isset($_SESSION["user"]["email"])) {
             $user_email = $_SESSION["user"]["email"];
             echo "<p>Welcome, $user_email</p>";
             echo '<p><a href="logout.php">Logout</a></p>'; // Logout link
         } else {
-            echo "<p>You're not logged in</p>";
+            // User is not logged in, display message and login button
+            echo "<p>You need to be logged in first</p>";
+            echo '<p><a href="login.php">Login</a></p>'; // Login button
         }
         ?>
     </main>
